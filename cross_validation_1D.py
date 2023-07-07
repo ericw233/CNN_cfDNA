@@ -9,13 +9,13 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import KFold
 from copy import deepcopy
 
-from model import CNN
-from load_data import load_data   
+from model import CNN_1D as CNN
+from load_data import load_data_1D as load_data   
     
-class CNNwithCV(CNN):
+class CNNwithCV_1D(CNN):
     def __init__(self, config, input_size, num_class):
         model_config=self._match_params(config)
-        super(CNNwithCV, self).__init__(input_size, num_class, **model_config)
+        super(CNNwithCV_1D, self).__init__(input_size, num_class, **model_config)
         self.batch_size=config["batch_size"]
         self.num_epochs=config["num_epochs"]
         

@@ -3,13 +3,11 @@ import torch.nn as nn
 import sys
 import os
 
-from model import CNN
+from model import CNN, CNN_1D
 from train_module import train_module
 
 # ray tune
-import ray
 from ray import tune
-from ray.air import Checkpoint, session
 from ray.tune.schedulers import ASHAScheduler
 from functools import partial
 
@@ -17,7 +15,8 @@ def ray_tune(num_samples=200, max_num_epochs=1000, gpus_per_trial=1,
          output_path="/mnt/binf/eric/CNN_Mercury_output/",
          data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv",
          input_size=55,
-         feature_type="Frag"):
+         feature_type="Frag",
+         dim="1D"):
 
     config = {
         "out1": tune.choice([2**i for i in range(4,7)]),
@@ -56,7 +55,8 @@ def ray_tune(num_samples=200, max_num_epochs=1000, gpus_per_trial=1,
         partial(train_module,
                 data_dir=data_dir,
                 input_size=input_size,
-                feature_type=feature_type),
+                feature_type=feature_type,
+                dim=dim),
         resources_per_trial={"cpu": 16, "gpu": gpus_per_trial},
         config=config,
         num_samples=num_samples,

@@ -2,8 +2,10 @@ import torch
 import torch.nn as nn
 import pandas as pd
 import numpy as np
-from pad_and_reshape import pad_and_reshape
 from sklearn.preprocessing import MinMaxScaler
+import sys
+
+from pad_and_reshape import pad_and_reshape, pad_and_reshape_1D
 
 def load_data(data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv", input_size=32, feature_type = "Arm"):
     # Read data from CSV file
@@ -47,7 +49,7 @@ def load_data(data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023
 
 
 ### copy and paste from load_data, not using pad_and_reshape, keeping the original 1D dimensions
-def load_data_1D(data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv", input_size=32, feature_type = "Arm"):
+def load_data_1D(data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv", input_size=1000, feature_type = "Arm"):
     # Read data from CSV file
     data = pd.read_csv(data_dir).dropna(axis=1)
 
@@ -72,12 +74,12 @@ def load_data_1D(data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2
 
     # Convert the data to PyTorch tensors
     input_size = input_size
-    X_train_tensor = torch.tensor(X_train_scaled, dtype=torch.float32)
+    X_train_tensor = pad_and_reshape_1D(X_train_scaled, input_size).type(torch.float32)
     y_train_tensor = torch.tensor(y_train.values, dtype=torch.float32)
-    X_test_tensor = torch.tensor(X_test_scaled, dtype=torch.float32)
+    X_test_tensor = pad_and_reshape_1D(X_test_scaled, input_size).type(torch.float32)
     y_test_tensor = torch.tensor(y_test.values, dtype=torch.float32)
 
-    X_all_tensor = torch.tensor(X_all_scaled, dtype=torch.float32)
+    X_all_tensor = pad_and_reshape_1D(X_all_scaled, input_size).type(torch.float32)
     y_all_tensor = torch.tensor(y_all.values, dtype=torch.float32)
 
     ### keep unshuffled X_train

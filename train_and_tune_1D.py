@@ -6,16 +6,15 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import KFold
 from copy import deepcopy
 import os
-import sys
 
-from model import CNN
-from load_data import load_data
+from model import CNN_1D as CNN
+from load_data import load_data_1D as load_data
 
 
-class CNNwithTrainingTuning(CNN):
+class CNNwithTrainingTuning_1D(CNN):
     def __init__(self, config, input_size, num_class):
         model_config=self._match_params(config)                      # find the parameters for the original CNN class
-        super(CNNwithTrainingTuning, self).__init__(input_size, num_class, **model_config)        # pass the parameters into the original CNN class
+        super(CNNwithTrainingTuning_1D, self).__init__(input_size, num_class, **model_config)        # pass the parameters into the original CNN class
         self.batch_size=config["batch_size"]
         self.num_epochs=config["num_epochs"]
         

@@ -1,8 +1,8 @@
 #!/bin/bash
-feature_type_list=(Cnv Frag Griffin Arm)
-input_size=(50 35 55 30)
+feature_type_list=(Cnv Frag Griffin Arm MCMS)
+input_size=(2500 1200 2600 800 200)
 for i in {0..4}
 do
-    python ./CNN_run.py ${feature_type_list[i]} ${input_size[i]} 200 1000 /mnt/binf/eric/Results_0704
+    python ./CNN_run.py ${feature_type_list[i]} 1D ${input_size[i]} 100 1000 /mnt/binf/eric/CNN_JulyResults/CNN_1D_0707 /mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv
 done
 

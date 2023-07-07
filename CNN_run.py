@@ -16,31 +16,37 @@ from model import CNN
 from load_data import load_data
 from ray_tune import ray_tune
 from train_and_tune import CNNwithTrainingTuning
+from train_and_tune_1D import CNNwithTrainingTuning_1D
 from cross_validation import CNNwithCV
+from cross_validation_1D import CNNwithCV_1D
 
 # default value of input_size and feature_type
 feature_type = "Griffin"
-input_size = 55
+dim = "1D"
+input_size = 2800
 tuning_num = 200
 epoch_num = 1000
-output_path="/mnt/binf/eric/CNN_Mercury_testoutput_0630"
+output_path="/mnt/binf/eric/CNN_JulyResults/CNN_Mercury_1D_0706"
+data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv"
 
 # get argument values from external inputs
 if len(sys.argv) >= 4:
     feature_type = sys.argv[1]
-    input_size = int(sys.argv[2])
-    tuning_num = int(sys.argv[3])
-    epoch_num = int(sys.argv[4])
-    output_path = sys.argv[5]
-    print(f"Getting arguments: feature type: {feature_type}, input size: {input_size}, \
+    dim = sys.argv[2]
+    input_size = int(sys.argv[3])
+    tuning_num = int(sys.argv[4])
+    epoch_num = int(sys.argv[5])
+    output_path = sys.argv[6]
+    print(f"Getting arguments: feature type: {feature_type}, dimension: {dim}, input size: {input_size}, \
         tuning round: {tuning_num}, epoch num: {epoch_num}, output path: {output_path}\n")  
 else:
     print(f"Not enough inputs, using default arguments: feature type: {feature_type}, input size: {input_size}, \
         tuning round: {tuning_num}, epoch num: {epoch_num}, output path: {output_path}\n")
 
+### finish loading parameters from external inputs
+
 num_class = 2
 output_path_cv=f"{output_path}_cv"
-data_dir="/mnt/binf/eric/Mercury_June2023_new/Feature_all_June2023_R01BMatch.csv"
 
 best_config={"out1": 16,"out2": 64,"conv1": 2,"pool1": 2,"drop1": 0,"conv2": 2,"pool2": 2,"drop2": 0,
              "fc1": 256,"fc2": 64,"drop3": 0.5,"batch_size": 256,"num_epochs": 2000}
@@ -52,7 +58,8 @@ try:
                                 output_path=output_path,
                                 data_dir=data_dir,
                                 input_size=input_size,
-                                feature_type=feature_type)
+                                feature_type=feature_type,
+                                dim=dim)
 except Exception as e:
     print("==========   Ray tune failed! An error occurred:", str(e),"   ==========")
 
@@ -76,7 +83,11 @@ print("***********************   Ray tune finished   ***************************
 
 #### train and tune CNN; CNNwithTrainingTuning class takes all variables in the config dictionary from ray_tune
 print("***********************   Start fittiing model with best configurations   ***********************************")
-CNN_trainvalid=CNNwithTrainingTuning(best_config, input_size=input_size,num_class=num_class)
+if(dim == "1D"):
+    CNN_trainvalid=CNNwithTrainingTuning_1D(best_config, input_size=input_size,num_class=num_class)
+else:
+    CNN_trainvalid=CNNwithTrainingTuning(best_config, input_size=input_size,num_class=num_class)
+    
 CNN_trainvalid.data_loader(data_dir=data_dir,
                      input_size=input_size,
                      feature_type=feature_type,
@@ -89,7 +100,11 @@ print("***********************   Completed fitting model   *********************
 
 #### cv process is independent
 print("***********************   Start cross validations   ***********************************")
-CNN_cv=CNNwithCV(best_config, input_size=input_size,num_class=num_class)
+if(dim == "1D"):
+    CNN_cv=CNNwithCV_1D(best_config, input_size=input_size,num_class=num_class)
+else:
+    CNN_cv=CNNwithCV(best_config, input_size=input_size,num_class=num_class)
+    
 CNN_cv.data_loader(data_dir=data_dir,
                     input_size=input_size,
                     feature_type=feature_type,
